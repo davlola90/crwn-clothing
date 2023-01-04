@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   signInWithGooglePopup,
-  createAuthUserWithEmailAndPassword,
   createUserDocumentFromAuth,
   signInAuthUserWithEmailAndPassword,
 } from "../../utils/firebase/firebase.utils";
@@ -19,24 +18,25 @@ const SignInForm = () => {
   const [formFields, setFormFields] = useState(initialFormFields);
   const { email, password } = formFields;
 
+
   const resetFormFields = () => {
     setFormFields(initialFormFields);
   };
 
   const signInWithGoogle = async () => {
-    const { user } = await signInWithGooglePopup();
-    await createUserDocumentFromAuth(user);
+  await signInWithGooglePopup();
+
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await signInAuthUserWithEmailAndPassword(
+      const { user } = await signInAuthUserWithEmailAndPassword(
         email,
         password
       );
-      console.log(response);
+    //  setCurrentUser(user);
       resetFormFields();
     } catch (error) {
       switch (error.code) {
@@ -45,6 +45,9 @@ const SignInForm = () => {
           break;
         case "auth/user-not-found":
           alert("Email not found");
+          break;
+        default:
+          alert(error.code);
           break;
       }
       console.log("user creation encountred an error", error);
@@ -78,7 +81,7 @@ const SignInForm = () => {
         />
         <div className="buttons-container">
           <Button type="submit">Sign In</Button>
-          <Button type='button' onClick={signInWithGoogle} buttonType="google">
+          <Button type="button" onClick={signInWithGoogle} buttonType="google">
             Google sign in
           </Button>
         </div>
